@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "480015080509",
+    "project_id": "monitoring-sampah-df40a",
+    "storage_bucket": "monitoring-sampah-df40a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:480015080509:android:cd73982c1f5a0076b25e54",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuVewj0-np1qpm834dhSQwDVZhu8fYXCI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

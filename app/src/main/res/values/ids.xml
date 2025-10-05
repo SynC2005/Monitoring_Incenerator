@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="tvWelcome" type="id" />
+    <item name="tvSubtitle" type="id" />
+    <item name="tilEmail" type="id" />
+    <item name="tilPassword" type="id" />
+    <item name="etEmail" type="id" />
+    <item name="tvForgotPassword" type="id" />
+    <item name="etPassword" type="id" />
+    <item name="tvRegisterLabel" type="id" />
+    <item name="tvRegister" type="id" />
+</resources>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="1080dp"
+    android:height="1920dp"
+    android:viewportWidth="1080"
+    android:viewportHeight="1920">
+
+    <!-- Background gradient (white → sky blue) -->
+    <path
+        android:pathData="M0,0h1080v1920h-1080z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startY="0"
+                android:endY="1920"
+                android:startColor="#FFFFFF"
+                android:endColor="#b1e6ba"
+                android:type="linear" />
+        </aapt:attr>
+    </path>
+
+    <!-- First wave -->
+    <path
+        android:pathData="M0,1500 C300,1400 700,1600 1080,1500 L1080,1920 L0,1920 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="0"
+                android:startY="1500"
+                android:endX="1080"
+                android:endY="1920"
+                android:startColor="#86eb95"
+                android:endColor="#37d836"
+                android:type="linear" />
+        </aapt:attr>
+    </path>
+
+    <!-- Second (foreground) wave for depth -->
+    <path
+        android:pathData="M0,1600 C400,1550 700,1750 1080,1600 L1080,1920 L0,1920 Z"
+        android:fillColor="#80e08c" />
+</vector>
