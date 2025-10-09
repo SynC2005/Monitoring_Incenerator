@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -79,7 +80,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleQRScan() {
         Toast.makeText(this, "Opening QR Scanner...", Toast.LENGTH_SHORT).show()
-        // TODO: startActivity(Intent(this, QRScannerActivity::class.java))
+        val intent = Intent(this, QRScannerActivity::class.java)
+        startActivity(intent)
     }
+
 }
 
