@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- Tema utama aplikasi -->
     <style name="Theme.MyApplication" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Warna utama -->
+        <item name="colorPrimary">@color/primary_green</item>
+        <item name="colorPrimaryVariant">@color/pastel_green</item>
+        <item name="colorOnPrimary">@color/white</item>
+
+        <!-- Warna sekunder -->
+        <item name="colorSecondary">@color/accent_blue</item>
+        <item name="colorOnSecondary">@color/white</item>
+
+        <!-- Pastikan TextInputLayout pakai style Material resmi -->
+        <item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox</item>
     </style>
 
 </resources>

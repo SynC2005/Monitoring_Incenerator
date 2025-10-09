@@ -9,4 +9,16 @@
     <color name="white">#FFFFFFFF</color>
     <color name="nav_active">#E53935</color>
     <color name="nav_inactive">#999999</color>
+    <color name="golden_dream">#E3EF26</color>
+    <color name="orinoco">#E3FBCE</color>
+    <color name="watercourse">#076653</color>
+    <color name="pastel_green">#49dc46</color>
+    <color name="primary_green">#31C343</color>
+    <color name="text_primary">#333333</color>
+    <color name="text_secondary">#666666</color>
+    <color name="accent_blue">#2196F3</color>
+    <color name="background_light">#F5F5F5</color>
+    <color name="gray_999">#999999</color>
+
+
 </resources>

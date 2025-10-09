@@ -57,7 +57,7 @@
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:src="@drawable/ic_timeline"
+                            android:src="@drawable/ic_data"
                             app:tint="#31c343" />
 
                         <TextView
@@ -223,176 +223,14 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- Bottom Navigation Bar -->
-    <LinearLayout
+    <!-- Bottom Navigation Bar (Included from navbar.xml) -->
+    <include
         android:id="@+id/bottomNavigation"
+        layout="@layout/navbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="#FFFFFF"
-        android:elevation="8dp"
-        android:paddingVertical="8dp"
-        android:paddingTop="32dp"
-        android:clipChildren="false"
-        android:clipToPadding="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <!-- Home Button -->
-        <LinearLayout
-            android:id="@+id/navHome"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:padding="8dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackgroundBorderless">
-
-            <ImageView
-                android:id="@+id/iconHome"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_home"
-                app:tint="#E53935"
-                android:contentDescription="Home" />
-
-            <TextView
-                android:id="@+id/labelHome"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Home"
-                android:textSize="12sp"
-                android:textColor="#E53935"
-                android:textStyle="bold"
-                android:layout_marginTop="4dp" />
-
-            <!-- Red Indicator Line -->
-            <View
-                android:id="@+id/indicatorHome"
-                android:layout_width="40dp"
-                android:layout_height="3dp"
-                android:background="#E53935"
-                android:layout_marginTop="4dp" />
-        </LinearLayout>
-
-        <!-- Timeline Button -->
-        <LinearLayout
-            android:id="@+id/navTimeline"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:padding="8dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackgroundBorderless">
-
-            <ImageView
-                android:id="@+id/iconTimeline"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_data"
-                app:tint="#999999"
-                android:contentDescription="Timeline" />
-
-            <TextView
-                android:id="@+id/labelTimeline"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Data"
-                android:textSize="12sp"
-                android:textColor="#999999"
-                android:layout_marginTop="4dp" />
-        </LinearLayout>
-
-        <!-- Add Button (Floating) -->
-        <RelativeLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:clipChildren="false"
-            android:clipToPadding="false">
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fabAdd"
-                android:layout_width="72dp"
-                android:layout_height="72dp"
-                android:layout_centerInParent="true"
-                android:layout_marginTop="-32dp"
-                android:src="@drawable/ic_qr"
-                app:tint="#FFFFFF"
-                app:backgroundTint="#E53935"
-                app:elevation="10dp"
-                android:contentDescription="Add"/>
-        </RelativeLayout>
-
-        <!-- Notification Button -->
-        <LinearLayout
-            android:id="@+id/navNotification"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:padding="8dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackgroundBorderless">
-
-            <ImageView
-                android:id="@+id/iconNotification"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_notification"
-                app:tint="#999999"
-                android:contentDescription="Notification" />
-
-            <TextView
-                android:id="@+id/labelNotification"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Notification"
-                android:textSize="12sp"
-                android:textColor="#999999"
-                android:layout_marginTop="4dp" />
-        </LinearLayout>
-
-        <!-- Profile Button -->
-        <LinearLayout
-            android:id="@+id/navProfile"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:padding="8dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackgroundBorderless">
-
-            <ImageView
-                android:id="@+id/iconProfile"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_profile"
-                app:tint="#999999"
-                android:contentDescription="Profile" />
-
-            <TextView
-                android:id="@+id/labelProfile"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Profile"
-                android:textSize="12sp"
-                android:textColor="#999999"
-                android:layout_marginTop="4dp" />
-        </LinearLayout>
-
-    </LinearLayout>
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

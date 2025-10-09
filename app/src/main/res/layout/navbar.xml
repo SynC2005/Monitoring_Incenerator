@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Simpan di: res/layout/navbar.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottomNavigation"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="#FFFFFF"
+    android:elevation="8dp"
+    android:paddingVertical="8dp"
+    android:paddingTop="32dp"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <!-- Home Button -->
+    <LinearLayout
+        android:id="@+id/navHome"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless">
+
+        <ImageView
+            android:id="@+id/iconHome"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_home"
+            app:tint="#999999"
+            android:contentDescription="Home" />
+
+        <TextView
+            android:id="@+id/labelHome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Home"
+            android:textSize="12sp"
+            android:textColor="#999999"
+            android:textStyle="bold"
+            android:layout_marginTop="4dp" />
+
+
+    </LinearLayout>
+
+    <!-- Data Button -->
+    <LinearLayout
+        android:id="@+id/navTimeline"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless">
+
+        <ImageView
+            android:id="@+id/iconTimeline"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_data"
+            app:tint="#999999"
+            android:contentDescription="Data" />
+
+        <TextView
+            android:id="@+id/labelTimeline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Data"
+            android:textSize="12sp"
+            android:textColor="#999999"
+            android:layout_marginTop="4dp" />
+    </LinearLayout>
+
+    <!-- QR Scan Button (Floating) -->
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:clipChildren="false"
+        android:clipToPadding="false">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabAdd"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="-40dp"
+            android:src="@drawable/ic_qr"
+            app:tint="#FFFFFF"
+            app:backgroundTint="@color/pastel_green"
+            app:elevation="10dp"
+            app:fabCustomSize="72dp"
+            app:maxImageSize="36dp"
+            android:contentDescription="QR Scan" />
+    </RelativeLayout>
+
+    <!-- Notification Button -->
+    <LinearLayout
+        android:id="@+id/navNotification"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless">
+
+        <ImageView
+            android:id="@+id/iconNotification"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_notification"
+            app:tint="#999999"
+            android:contentDescription="Notification" />
+
+        <TextView
+            android:id="@+id/labelNotification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Notification"
+            android:textSize="12sp"
+            android:textColor="#999999"
+            android:layout_marginTop="4dp" />
+    </LinearLayout>
+
+    <!-- Profile Button -->
+    <LinearLayout
+        android:id="@+id/navProfile"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless">
+
+        <ImageView
+            android:id="@+id/iconProfile"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_profile"
+            app:tint="#999999"
+            android:contentDescription="Profile" />
+
+        <TextView
+            android:id="@+id/labelProfile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Profile"
+            android:textSize="12sp"
+            android:textColor="#999999"
+            android:layout_marginTop="4dp" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -13,8 +13,8 @@
             <gradient
                 android:startY="0"
                 android:endY="1920"
-                android:startColor="#FFFFFF"
-                android:endColor="#b1e6ba"
+                android:startColor="@color/orinoco"
+                android:endColor="@color/golden_dream"
                 android:type="linear" />
         </aapt:attr>
     </path>
@@ -29,7 +29,7 @@
                 android:endX="1080"
                 android:endY="1920"
                 android:startColor="#86eb95"
-                android:endColor="#37d836"
+                android:endColor="@color/watercourse"
                 android:type="linear" />
         </aapt:attr>
     </path>
@@ -37,5 +37,5 @@
     <!-- Second (foreground) wave for depth -->
     <path
         android:pathData="M0,1600 C400,1550 700,1750 1080,1600 L1080,1920 L0,1920 Z"
-        android:fillColor="#80e08c" />
+        android:fillColor="@color/watercourse" />
 </vector>

@@ -4,12 +4,12 @@
 
     <corners android:radius="12dp" />
 
-    <solid android:color="#b9b9b9" />
+    <solid android:color="#ffff" />
 
 
     <stroke
         android:width="5dp"
-        android:color="#A5D6A7" />
+        android:color="@color/pastel_green" />
 
     <padding
         android:left="12dp"
