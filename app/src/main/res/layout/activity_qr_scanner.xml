@@ -7,7 +7,7 @@
     android:background="#000000"
     tools:context=".QRScannerActivity">
 
-    <!-- Tampilan kamera full screen -->
+    <!-- 🔹 Tampilan kamera -->
     <androidx.camera.view.PreviewView
         android:id="@+id/previewView"
         android:layout_width="0dp"
@@ -17,38 +17,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Overlay kotak fokus QR code -->
+    <!-- 🔹 Frame fokus QR -->
     <View
         android:id="@+id/focusFrame"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:layout_gravity="center"
+        android:layout_width="260dp"
+        android:layout_height="260dp"
         android:background="@drawable/focus_frame_border"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Tombol kembali ke Home -->
-    <com.google.android.material.button.MaterialButton
+    <!-- 🔹 Tombol Back: ImageButton bundar -->
+    <ImageButton
         android:id="@+id/btnBackHome"
-        style="@style/Widget.MaterialComponents.Button.Icon"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="@android:color/transparent"
-        android:icon="@drawable/ic_arrow_back"
-        android:iconTint="@android:color/white"
-        android:insetTop="0dp"
-        android:insetBottom="0dp"
-        app:cornerRadius="24dp"
-        app:iconGravity="start"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="28dp"
+        android:background="@drawable/bg_round_transparent_button"
+        android:src="@drawable/ic_arrow_back"
+        android:scaleType="centerInside"
+        android:padding="12dp"
+        android:contentDescription="Kembali ke Home"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:contentDescription="Kembali ke Home" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Overlay untuk hasil scan & tombol -->
+    <!-- 🔹 Overlay teks hasil -->
     <LinearLayout
         android:id="@+id/overlayContainer"
         android:orientation="vertical"
@@ -59,7 +54,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Hasil scan -->
         <TextView
             android:id="@+id/tvResult"
             android:layout_width="match_parent"
@@ -68,57 +62,11 @@
             android:textColor="@android:color/white"
             android:textSize="18sp"
             android:gravity="center"
-            android:padding="8dp" />
-
-        <!-- Gambar hasil generate QR Code -->
-        <ImageView
-            android:id="@+id/imgGeneratedQR"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:layout_marginTop="8dp"
-            android:visibility="gone"
-            android:contentDescription="Generated QR Code"
-            android:layout_gravity="center_horizontal" />
-
-        <!-- Tombol aktif/nonaktif -->
-        <LinearLayout
-            android:id="@+id/buttonContainer"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_marginTop="16dp">
-
-            <Button
-                android:id="@+id/btnActivate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Aktif"
-                android:layout_marginEnd="16dp"
-                android:backgroundTint="@color/pastel_green"
-                android:textColor="@android:color/white" />
-
-            <Button
-                android:id="@+id/btnDeactivate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Non Aktif"
-                android:backgroundTint="@android:color/holo_red_light"
-                android:textColor="@android:color/white" />
-        </LinearLayout>
+            android:padding="8dp"
+            android:background="#66000000"
+            android:elevation="4dp"
+            android:layout_marginBottom="12dp"
+            android:clipToOutline="true" />
     </LinearLayout>
-
-    <!-- Tombol tambah mesin (FAB) -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btnAddMachine"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_add"
-        app:tint="@android:color/white"
-        app:backgroundTint="@color/pastel_green"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="24dp"
-        android:contentDescription="Tambah Mesin Baru" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

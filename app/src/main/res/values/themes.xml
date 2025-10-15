@@ -12,6 +12,11 @@
         <item name="colorSecondary">@color/accent_blue</item>
         <item name="colorOnSecondary">@color/white</item>
 
+        <!-- Warna background -->
+        <item name="android:colorBackground">@android:color/white</item>
+
+        <!-- 🔹 Pastikan warna teks di surface bukan putih -->
+        <item name="colorOnSurface">@android:color/black</item>
         <!-- Pastikan TextInputLayout pakai style Material resmi -->
         <item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox</item>
     </style>

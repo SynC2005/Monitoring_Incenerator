@@ -1,166 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Simpan di: res/layout/navbar.xml -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/bottomNavigation"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="80dp"
     android:orientation="horizontal"
-    android:background="#FFFFFF"
-    android:elevation="8dp"
-    android:paddingVertical="8dp"
-    android:paddingTop="32dp"
+    android:gravity="center"
+    android:background="@drawable/navbar_background"
+    android:elevation="12dp"
+    android:paddingHorizontal="12dp"
     android:clipChildren="false"
     android:clipToPadding="false">
 
-    <!-- Home Button -->
+    <!-- 🔹 Home Button -->
     <LinearLayout
         android:id="@+id/navHome"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:padding="8dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="?attr/selectableItemBackgroundBorderless">
+        style="@style/BottomNavItem"
+        android:contentDescription="Home">
 
         <ImageView
             android:id="@+id/iconHome"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            style="@style/BottomNavIcon"
             android:src="@drawable/ic_home"
-            app:tint="#999999"
-            android:contentDescription="Home" />
+            app:tint="#777777" />
 
         <TextView
             android:id="@+id/labelHome"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Home"
-            android:textSize="12sp"
-            android:textColor="#999999"
-            android:textStyle="bold"
-            android:layout_marginTop="4dp" />
-
-
+            style="@style/BottomNavLabel"
+            android:text="Home" />
     </LinearLayout>
 
-    <!-- Data Button -->
+    <!-- 🔹 Data Button -->
     <LinearLayout
         android:id="@+id/navTimeline"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:padding="8dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="?attr/selectableItemBackgroundBorderless">
+        style="@style/BottomNavItem"
+        android:contentDescription="Data">
 
         <ImageView
             android:id="@+id/iconTimeline"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            style="@style/BottomNavIcon"
             android:src="@drawable/ic_data"
-            app:tint="#999999"
-            android:contentDescription="Data" />
+            app:tint="#777777" />
 
         <TextView
             android:id="@+id/labelTimeline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Data"
-            android:textSize="12sp"
-            android:textColor="#999999"
-            android:layout_marginTop="4dp" />
+            style="@style/BottomNavLabel"
+            android:text="Data" />
     </LinearLayout>
 
-    <!-- QR Scan Button (Floating) -->
-    <RelativeLayout
+    <!-- 🔹 Floating QR Button -->
+    <FrameLayout
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="1"
         android:clipChildren="false"
-        android:clipToPadding="false">
+        android:clipToPadding="false"
+        android:gravity="center">
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabAdd"
+        <!-- ✅ Outline Glow -->
+        <View
+            android:id="@+id/qrGlowOutline"
             android:layout_width="72dp"
             android:layout_height="72dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="-40dp"
-            android:src="@drawable/ic_qr"
-            app:tint="#FFFFFF"
-            app:backgroundTint="@color/pastel_green"
-            app:elevation="10dp"
-            app:fabCustomSize="72dp"
-            app:maxImageSize="36dp"
-            android:contentDescription="QR Scan" />
-    </RelativeLayout>
+            android:layout_gravity="center"
+            android:background="@drawable/qr_outline_glow" />
 
-    <!-- Notification Button -->
+        <!-- ✅ Floating Action Button -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabAdd"
+            android:layout_width="55dp"
+            android:layout_height="500dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_qr"
+            app:tint="@android:color/white"
+            app:backgroundTint="@color/pastel_green"
+            app:elevation="8dp"
+            app:maxImageSize="28dp"
+            android:contentDescription="Scan QR" />
+    </FrameLayout>
+
+    <!-- 🔹 Notification Button -->
     <LinearLayout
         android:id="@+id/navNotification"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:padding="8dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="?attr/selectableItemBackgroundBorderless">
+        style="@style/BottomNavItem"
+        android:contentDescription="Notification">
 
         <ImageView
             android:id="@+id/iconNotification"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            style="@style/BottomNavIcon"
             android:src="@drawable/ic_notification"
-            app:tint="#999999"
-            android:contentDescription="Notification" />
+            app:tint="#777777" />
 
         <TextView
             android:id="@+id/labelNotification"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Notification"
-            android:textSize="12sp"
-            android:textColor="#999999"
-            android:layout_marginTop="4dp" />
+            style="@style/BottomNavLabel"
+            android:text="Notifikasi" />
     </LinearLayout>
 
-    <!-- Profile Button -->
+    <!-- 🔹 Profile Button -->
     <LinearLayout
         android:id="@+id/navProfile"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:padding="8dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="?attr/selectableItemBackgroundBorderless">
+        style="@style/BottomNavItem"
+        android:contentDescription="Profile">
 
         <ImageView
             android:id="@+id/iconProfile"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            style="@style/BottomNavIcon"
             android:src="@drawable/ic_profile"
-            app:tint="#999999"
-            android:contentDescription="Profile" />
+            app:tint="#777777" />
 
         <TextView
             android:id="@+id/labelProfile"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Profile"
-            android:textSize="12sp"
-            android:textColor="#999999"
-            android:layout_marginTop="4dp" />
+            style="@style/BottomNavLabel"
+            android:text="Profil" />
     </LinearLayout>
 
 </LinearLayout>

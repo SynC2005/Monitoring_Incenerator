@@ -98,20 +98,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:startIconDrawable="@android:drawable/ic_dialog_email"
+                app:startIconTint="@color/pastel_green"
                 app:boxBackgroundMode="outline"
-                app:boxCornerRadiusTopStart="8dp"
-                app:boxCornerRadiusTopEnd="8dp"
-                app:boxCornerRadiusBottomStart="8dp"
-                app:boxCornerRadiusBottomEnd="8dp"
+                app:boxStrokeColor="@color/outline_selector"
+                app:hintTextColor="@color/hint_selector"
+                android:hint="Email"
                 android:layout_marginBottom="16dp">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etEmailLogin"
-
-                    android:background="@drawable/fillbox_bg"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Email"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_secondary"
                     android:inputType="textEmailAddress"
                     android:padding="16dp" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -123,24 +122,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:startIconDrawable="@android:drawable/ic_lock_idle_lock"
+                app:startIconTint="@color/pastel_green"
                 app:endIconMode="password_toggle"
+                app:endIconTint="@color/pastel_green"
                 app:boxBackgroundMode="outline"
-                app:boxCornerRadiusTopStart="8dp"
-                app:boxCornerRadiusTopEnd="8dp"
-                app:boxCornerRadiusBottomStart="8dp"
-                app:boxCornerRadiusBottomEnd="8dp"
+                app:boxStrokeColor="@color/outline_selector"
+                app:hintTextColor="@color/hint_selector"
+                android:hint="Password"
                 android:layout_marginBottom="8dp">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etPasswordLogin"
-
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/fillbox_bg"
-                    android:hint="Password"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_secondary"
                     android:inputType="textPassword"
                     android:padding="16dp" />
             </com.google.android.material.textfield.TextInputLayout>
+
 
             <!-- Forgot Password -->
             <TextView

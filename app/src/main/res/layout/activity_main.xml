@@ -64,7 +64,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Data Display"
+                            android:text="Data Banyak Sampah"
                             android:textSize="18sp"
                             android:textStyle="bold"
                             android:textColor="#333333"
@@ -126,17 +126,17 @@
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
                             android:layout_weight="1"
-                            android:text="Monitoring Results"
-                            android:textSize="18sp"
-                            android:textStyle="bold"
+                            android:text="Persebaran Mesin"
                             android:textColor="#333333"
-                            android:layout_marginStart="12dp" />
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Details"
+                            android:text="Buka peta"
                             android:textSize="14sp"
                             android:textColor="#2196F3"
                             android:clickable="true"
@@ -190,16 +190,17 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Additional Information"
+                            android:text="Data Mesin Aktif"
                             android:textSize="18sp"
                             android:textStyle="bold"
                             android:textColor="#333333"
                             android:layout_marginStart="12dp" />
 
                         <TextView
+                            android:id="@+id/tvAddMachine"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="More"
+                            android:text="Tambah Mesin"
                             android:textSize="14sp"
                             android:textColor="#2196F3"
                             android:clickable="true"
@@ -207,15 +208,13 @@
                     </LinearLayout>
 
                     <!-- Content Placeholder -->
-                    <TextView
+                    <LinearLayout
+                        android:id="@+id/machineContainer"
                         android:layout_width="match_parent"
-                        android:layout_height="180dp"
-                        android:text="Additional content, statistics, or information goes here"
-                        android:textSize="14sp"
-                        android:textColor="#999999"
-                        android:gravity="center"
-                        android:background="#F9F9F9"
-                        android:padding="16dp" />
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="8dp"
+                        android:background="#F9F9F9" />
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
