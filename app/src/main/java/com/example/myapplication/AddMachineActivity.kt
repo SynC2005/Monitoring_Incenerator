@@ -1,149 +1,179 @@
 package com.example.myapplication
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.Color
-import android.os.Build
+import android.location.Location
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import com.example.myapplication.databinding.ActivityAddMachineBinding
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.qrcode.QRCodeWriter
+import java.security.SecureRandom
 
 class AddMachineActivity : AppCompatActivity() {
 
-    private lateinit var etMachineName: EditText
-    private lateinit var etLocationLink: EditText
-    private lateinit var btnSave: Button
-    private val db = FirebaseFirestore.getInstance()
+    private lateinit var binding: ActivityAddMachineBinding
+    private lateinit var db: FirebaseFirestore
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-    // simpan QR sementara
-    private var tempBitmap: Bitmap? = null
-    private var tempFileName: String = ""
+    private val LOCATION_PERMISSION_REQUEST_CODE = 1001
+
+    // karakter yang boleh digunakan untuk credential
+    private val CREDENTIAL_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+    private val secureRandom = SecureRandom()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_machine)
+        binding = ActivityAddMachineBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        etMachineName = findViewById(R.id.etMachineName)
-        etLocationLink = findViewById(R.id.etLocationLink)
-        btnSave = findViewById(R.id.btnSaveMachine)
+        db = FirebaseFirestore.getInstance()
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        // Izin tulis (Android 9 ke bawah)
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                    1
-                )
-            }
-        }
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = "Tambah Mesin"
 
-        btnSave.setOnClickListener { saveMachine() }
+        setupListeners()
     }
 
-    private fun saveMachine() {
-        val name = etMachineName.text.toString().trim()
-        val locationLink = etLocationLink.text.toString().trim()
+    private fun setupListeners() {
+        binding.btnGetCurrentLocation.setOnClickListener {
+            getCurrentLocation()
+        }
 
-        if (name.isEmpty() || locationLink.isEmpty()) {
-            Toast.makeText(this, "Semua field harus diisi!", Toast.LENGTH_SHORT).show()
+        binding.btnSaveMachine.setOnClickListener {
+            saveMachine()
+        }
+    }
+
+    private fun getCurrentLocation() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
             return
         }
 
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location: Location? ->
+                if (location != null) {
+                    binding.etLatitude.setText(location.latitude.toString())
+                    binding.etLongitude.setText(location.longitude.toString())
+                    Toast.makeText(this, "Lokasi berhasil didapatkan", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Tidak bisa mendapatkan lokasi. Coba lagi.", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun saveMachine() {
+        val machineName = binding.etMachineName.text.toString().trim()
+        val latitudeStr = binding.etLatitude.text.toString().trim()
+        val longitudeStr = binding.etLongitude.text.toString().trim()
+
+        // Validasi input
+        if (machineName.isEmpty()) {
+            binding.etMachineName.error = "Nama mesin harus diisi"
+            return
+        }
+
+        if (latitudeStr.isEmpty()) {
+            binding.etLatitude.error = "Latitude harus diisi"
+            return
+        }
+
+        if (longitudeStr.isEmpty()) {
+            binding.etLongitude.error = "Longitude harus diisi"
+            return
+        }
+
+        val latitude = latitudeStr.toDoubleOrNull()
+        val longitude = longitudeStr.toDoubleOrNull()
+
+        if (latitude == null || longitude == null) {
+            Toast.makeText(this, "Koordinat tidak valid", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Validasi range koordinat
+        if (latitude < -90 || latitude > 90) {
+            binding.etLatitude.error = "Latitude harus antara -90 dan 90"
+            return
+        }
+
+        if (longitude < -180 || longitude > 180) {
+            binding.etLongitude.error = "Longitude harus antara -180 dan 180"
+            return
+        }
+
+        // Generate credential otomatis (tidak tampil di UI)
         val credential = generateCredential(20)
 
-        val data = mapOf(
+        // Generate mapLink dari koordinat
+        val mapLink = "https://www.google.com/maps/search/?api=1&query=$latitude,$longitude"
+
+        // Simpan ke Firestore
+        val machineData = hashMapOf(
             "Credential" to credential,
             "Status" to false,
-            "mapLink" to locationLink
+            "Latitude" to latitude,
+            "Longitude" to longitude,
+            "mapLink" to mapLink
         )
 
         db.collection("Data Incenerator")
-            .document(name)
-            .set(data, SetOptions.merge())
+            .document(machineName)
+            .set(machineData)
             .addOnSuccessListener {
-                generateQRCodeAndAskToSave(credential, name)
+                Toast.makeText(this, "Mesin \"$machineName\" berhasil ditambahkan", Toast.LENGTH_SHORT).show()
+                finish()
             }
-            .addOnFailureListener {
-                Toast.makeText(this, "Gagal menyimpan data ke database", Toast.LENGTH_SHORT).show()
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Gagal menambahkan mesin: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
-    private fun generateCredential(length: Int): String {
-        val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-        return (1..length).map { chars.random() }.joinToString("")
-    }
-
-    // 🔹 Generate QR lalu minta user pilih lokasi penyimpanan
-    private fun generateQRCodeAndAskToSave(content: String, machineName: String) {
-        try {
-            if (content.isEmpty()) {
-                Toast.makeText(this, "Credential kosong, QR gagal dibuat", Toast.LENGTH_SHORT).show()
-                return
-            }
-
-            val writer = QRCodeWriter()
-            val bitMatrix = writer.encode(content, BarcodeFormat.QR_CODE, 512, 512)
-
-            val bmp = Bitmap.createBitmap(512, 512, Bitmap.Config.RGB_565)
-            for (x in 0 until 512) {
-                for (y in 0 until 512) {
-                    bmp.setPixel(x, y, if (bitMatrix[x, y]) Color.BLACK else Color.WHITE)
-                }
-            }
-
-            tempBitmap = bmp
-            tempFileName = "QR_$machineName.png"
-
-            // 🔹 Buka dialog sistem untuk pilih lokasi simpan
-            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                addCategory(Intent.CATEGORY_OPENABLE)
-                type = "image/png"
-                putExtra(Intent.EXTRA_TITLE, tempFileName)
-            }
-            saveFileLauncher.launch(intent)
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(this, "Gagal membuat QR Code: ${e.message}", Toast.LENGTH_LONG).show()
-        }
-    }
-
-    // 🔹 Menangani hasil pemilihan lokasi simpan file
-    private val saveFileLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == RESULT_OK) {
-            val uri = result.data?.data
-            if (uri != null && tempBitmap != null) {
-                try {
-                    contentResolver.openOutputStream(uri)?.use { outputStream ->
-                        tempBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                    }
-                    Toast.makeText(this, "✅ QR Code berhasil disimpan!", Toast.LENGTH_LONG).show()
-                    finish()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    Toast.makeText(this, "Gagal menyimpan file: ${e.message}", Toast.LENGTH_LONG).show()
-                }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getCurrentLocation()
             } else {
-                Toast.makeText(this, "Gagal: QR kosong atau lokasi tidak dipilih", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Permission ditolak", Toast.LENGTH_SHORT).show()
             }
-        } else {
-            Toast.makeText(this, "Penyimpanan dibatalkan oleh pengguna", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
+    }
+
+    // -----------------------
+    // Fungsi helper: generate credential acak
+    // -----------------------
+    private fun generateCredential(length: Int): String {
+        val sb = StringBuilder(length)
+        repeat(length) {
+            val idx = secureRandom.nextInt(CREDENTIAL_CHARS.length)
+            sb.append(CREDENTIAL_CHARS[idx])
+        }
+        return sb.toString()
     }
 }

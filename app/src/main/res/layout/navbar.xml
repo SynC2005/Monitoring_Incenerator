@@ -106,13 +106,13 @@
         <ImageView
             android:id="@+id/iconProfile"
             style="@style/BottomNavIcon"
-            android:src="@drawable/ic_profile"
+            android:src="@drawable/ic_books"
             app:tint="#777777" />
 
         <TextView
             android:id="@+id/labelProfile"
             style="@style/BottomNavLabel"
-            android:text="Profil" />
+            android:text="Tutorial" />
     </LinearLayout>
 
 </LinearLayout>

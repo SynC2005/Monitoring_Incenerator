@@ -120,7 +120,7 @@
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:src="@drawable/ic_notification"
+                            android:src="@drawable/baseline_map_24"
                             app:tint="#E53935" />
 
                         <TextView
@@ -128,12 +128,13 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
                             android:layout_weight="1"
-                            android:text="Persebaran Mesin"
+                            android:text="Peta Persebaran Mesin"
                             android:textColor="#333333"
                             android:textSize="18sp"
                             android:textStyle="bold" />
 
                         <TextView
+                            android:id="@+id/tvOpenMap"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Buka peta"
@@ -143,16 +144,27 @@
                             android:focusable="true" />
                     </LinearLayout>
 
-                    <!-- Content Placeholder -->
-                    <TextView
+                    <!-- Machine Locations List -->
+                    <LinearLayout
+                        android:id="@+id/machineLocationsList"
                         android:layout_width="match_parent"
-                        android:layout_height="150dp"
-                        android:text="Monitoring data and charts will appear here"
-                        android:textSize="14sp"
-                        android:textColor="#999999"
-                        android:gravity="center"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
                         android:background="#F9F9F9"
-                        android:padding="16dp" />
+                        android:padding="12dp"
+                        android:minHeight="150dp">
+
+                        <TextView
+                            android:id="@+id/tvMapStatus"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Memuat lokasi mesin..."
+                            android:textSize="14sp"
+                            android:textColor="#999999"
+                            android:gravity="center"
+                            android:padding="16dp" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -183,7 +195,7 @@
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:src="@drawable/ic_home"
+                            android:src="@drawable/ic_incenerator"
                             app:tint="#FF9800" />
 
                         <TextView
