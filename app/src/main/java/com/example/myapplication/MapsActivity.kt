@@ -69,21 +69,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     val name = doc.id
                     val status = doc.getBoolean("Status") ?: false
                     val credential = doc.getString("Credential") ?: ""
-                    val mapLink = doc.getString("mapLink") ?: ""
+                    val latitude = doc.getDouble("Latitude")
+                    val longitude = doc.getDouble("Longitude")
 
-                    // Extract koordinat dari mapLink
-                    val coordinates = Machine.extractCoordinatesFromMapLink(mapLink)
-
-                    if (coordinates != null) {
-                        val latitude = coordinates.first
-                        val longitude = coordinates.second
-
-                        val machine = Machine(name, status, latitude, longitude, credential, mapLink)
+                    if (latitude != null && longitude != null) {
+                        val machine = Machine(name, status, latitude, longitude, credential, "")
                         machines.add(machine)
 
                         val position = LatLng(latitude, longitude)
-
                         val markerIcon = createCustomMarker(status)
+
                         mMap.addMarker(
                             MarkerOptions()
                                 .position(position)
@@ -102,15 +97,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     val padding = 100
                     mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding))
                 } else {
-                    val jakarta = LatLng(-6.2088, 106.8456)
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(jakarta, 12f))
+                    val defaultLoc = LatLng(-6.2088, 106.8456)
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLoc, 12f))
                     Toast.makeText(this, "Tidak ada mesin dengan lokasi valid", Toast.LENGTH_SHORT).show()
                 }
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Gagal memuat data: ${e.message}", Toast.LENGTH_SHORT).show()
-                val jakarta = LatLng(-6.2088, 106.8456)
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(jakarta, 12f))
+                val defaultLoc = LatLng(-6.2088, 106.8456)
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLoc, 12f))
             }
     }
 

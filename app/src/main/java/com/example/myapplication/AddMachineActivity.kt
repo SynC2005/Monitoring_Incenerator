@@ -1,16 +1,21 @@
 package com.example.myapplication
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Location
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.example.myapplication.databinding.ActivityAddMachineBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.qrcode.QRCodeWriter
 import java.security.SecureRandom
 
 class AddMachineActivity : AppCompatActivity() {
@@ -24,6 +29,20 @@ class AddMachineActivity : AppCompatActivity() {
     // karakter yang boleh digunakan untuk credential
     private val CREDENTIAL_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
     private val secureRandom = SecureRandom()
+
+    private var generatedCredential: String? = null
+    private var machineNameForNavigation: String? = null
+
+    // Launcher untuk memilih lokasi penyimpanan
+    private val createFileLauncher =
+        registerForActivityResult(ActivityResultContracts.CreateDocument("image/png")) { uri ->
+            if (uri != null && generatedCredential != null) {
+                saveQrCodeToUri(uri, generatedCredential!!)
+            } else {
+                Toast.makeText(this, "Penyimpanan dibatalkan", Toast.LENGTH_SHORT).show()
+                navigateBackToMain()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,7 +83,7 @@ class AddMachineActivity : AppCompatActivity() {
         }
 
         fusedLocationClient.lastLocation
-            .addOnSuccessListener { location: Location? ->
+            .addOnSuccessListener { location ->
                 if (location != null) {
                     binding.etLatitude.setText(location.latitude.toString())
                     binding.etLongitude.setText(location.longitude.toString())
@@ -118,8 +137,10 @@ class AddMachineActivity : AppCompatActivity() {
             return
         }
 
-        // Generate credential otomatis (tidak tampil di UI)
+        // Generate credential otomatis
         val credential = generateCredential(20)
+        generatedCredential = credential
+        machineNameForNavigation = machineName
 
         // Generate mapLink dari koordinat
         val mapLink = "https://www.google.com/maps/search/?api=1&query=$latitude,$longitude"
@@ -137,12 +158,66 @@ class AddMachineActivity : AppCompatActivity() {
             .document(machineName)
             .set(machineData)
             .addOnSuccessListener {
-                Toast.makeText(this, "Mesin \"$machineName\" berhasil ditambahkan", Toast.LENGTH_SHORT).show()
-                finish()
+                Toast.makeText(
+                    this,
+                    "Mesin \"$machineName\" berhasil ditambahkan",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                // Setelah sukses, tawarkan user untuk menyimpan QR Code
+                askToSaveQrCode(credential)
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Gagal menambahkan mesin: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Gagal menambahkan mesin: ${e.message}", Toast.LENGTH_SHORT)
+                    .show()
             }
+    }
+
+    private fun askToSaveQrCode(credential: String) {
+        Toast.makeText(this, "Pilih lokasi untuk menyimpan QR Code", Toast.LENGTH_SHORT).show()
+        createFileLauncher.launch("QR_$credential.png")
+    }
+
+    private fun saveQrCodeToUri(uri: Uri, credential: String) {
+        try {
+            val qrBitmap = generateQrBitmap(credential)
+            val outputStream = contentResolver.openOutputStream(uri)
+
+            if (outputStream != null) {
+                outputStream.use { stream ->
+                    qrBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                }
+                Toast.makeText(this, "QR Code berhasil disimpan", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Gagal menyimpan: OutputStream null", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, "Gagal menyimpan QR Code: ${e.message}", Toast.LENGTH_SHORT)
+                .show()
+        } finally {
+            // Kembali ke MainActivity setelah selesai
+            navigateBackToMain()
+        }
+    }
+
+    private fun generateQrBitmap(data: String): Bitmap {
+        val size = 512
+        val bits = QRCodeWriter().encode(data, BarcodeFormat.QR_CODE, size, size)
+        val bmp = Bitmap.createBitmap(size, size, Bitmap.Config.RGB_565)
+        for (x in 0 until size) {
+            for (y in 0 until size) {
+                bmp.setPixel(x, y, if (bits[x, y]) 0xFF000000.toInt() else 0xFFFFFFFF.toInt())
+            }
+        }
+        return bmp
+    }
+
+    private fun navigateBackToMain() {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+        finish()
     }
 
     override fun onRequestPermissionsResult(
