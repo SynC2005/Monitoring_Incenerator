@@ -81,15 +81,70 @@
                     </LinearLayout>
 
                     <!-- Content Placeholder -->
-                    <TextView
+                    <!-- Dua Bagian: Kiri Upload | Kanan Display Berat Sampah -->
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="120dp"
-                        android:text="Your data will be displayed here"
-                        android:textSize="14sp"
-                        android:textColor="#999999"
-                        android:gravity="center"
-                        android:background="#F9F9F9"
-                        android:padding="16dp" />
+                        android:layout_height="150dp"
+                        android:orientation="horizontal">
+
+                        <!-- Bagian Kiri: Tombol Upload -->
+                        <LinearLayout
+                            android:id="@+id/sectionUpload"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:background="#F1F8E9"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/btnUploadData"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="UPLOAD"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:padding="12dp"
+                                android:background="@drawable/button_rounded"
+                                android:textColor="#FFFFFF"
+                                android:gravity="center"
+                                android:layout_margin="8dp"/>
+                        </LinearLayout>
+
+                        <!-- Bagian Kanan: Indikator Berat Sampah -->
+                        <FrameLayout
+                            android:id="@+id/sectionBeratContainer"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="#F9F9F9">
+
+                            <TextView
+                                android:id="@+id/tvBeratSampah"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:text="0 kg"
+                                android:textColor="#333333"
+                                android:textSize="26sp"
+                                android:textStyle="bold"/>
+
+                            <!-- Hover jika Bluetooth belum terhubung -->
+                            <TextView
+                                android:id="@+id/hoverBluetoothWarning"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="#AA000000"
+                                android:text="Perangkat belum terhubung ke sensor pengukur berat sampah, silahkan hubungkan terlebih dahulu"
+                                android:textColor="#FFFFFF"
+                                android:textSize="14sp"
+                                android:gravity="center"
+                                android:padding="16dp"
+                                android:visibility="gone"/>
+                        </FrameLayout>
+
+                    </LinearLayout>
+
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>

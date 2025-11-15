@@ -1,8 +1,12 @@
 package com.example.myapplication
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.widget.LinearLayout
@@ -10,6 +14,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import com.example.myapplication.databinding.ActivityMainBinding
 import com.example.myapplication.databinding.NavbarBinding
 import com.google.firebase.firestore.FirebaseFirestore
@@ -23,6 +28,12 @@ class MainActivity : AppCompatActivity() {
     private var machineListener: ListenerRegistration? = null
     private val machines = mutableListOf<Machine>()
 
+    // Bluetooth
+    private lateinit var bluetoothHelper: BluetoothHelper
+    private val BLUETOOTH_REQ_CODE = BluetoothHelper.REQ_PERMISSION_CODE
+    private var isBluetoothConnected = false
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -32,33 +43,222 @@ class MainActivity : AppCompatActivity() {
         setupCardListeners()
         setupAddMachineButton()
         setupMapButton()
+        setupBeratSampahSection()
+        setupUploadButton()
+
+        /* ============================
+               INIT BLUETOOTH
+        ============================ */
+        bluetoothHelper = BluetoothHelper(this, object : BluetoothHelper.Listener {
+
+            override fun onPermissionRequired(permissions: Array<String>, requestCode: Int) {
+                ActivityCompat.requestPermissions(this@MainActivity, permissions, requestCode)
+            }
+
+            override fun onPairedDevices(devices: List<android.bluetooth.BluetoothDevice>) {
+                if (!hasBluetoothPermission()) return
+                showPairedDevicesDialog(devices)
+            }
+
+            override fun onConnecting(device: android.bluetooth.BluetoothDevice) {
+                if (!hasBluetoothPermission()) return
+
+                try {
+                    Toast.makeText(this@MainActivity, "Menghubungkan ke ${device.name}...", Toast.LENGTH_SHORT).show()
+                } catch (e: SecurityException) {
+                    Toast.makeText(this@MainActivity, "Menghubungkan ke perangkat...", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onConnected(device: android.bluetooth.BluetoothDevice) {
+                if (!hasBluetoothPermission()) return
+
+                try {
+                    Toast.makeText(this@MainActivity, "Terhubung ke ${device.name}", Toast.LENGTH_SHORT).show()
+                } catch (e: SecurityException) {
+                    Toast.makeText(this@MainActivity, "Terhubung ke perangkat", Toast.LENGTH_SHORT).show()
+                }
+
+                isBluetoothConnected = true
+                updateBluetoothWarning()
+            }
+
+            override fun onDisconnected() {
+                Toast.makeText(this@MainActivity, "Bluetooth terputus", Toast.LENGTH_SHORT).show()
+                isBluetoothConnected = false
+                updateBluetoothWarning()
+            }
+
+            override fun onConnectionFailed(reason: String) {
+                Toast.makeText(this@MainActivity, "Gagal koneksi: $reason", Toast.LENGTH_SHORT).show()
+                isBluetoothConnected = false
+                updateBluetoothWarning()
+            }
+
+            override fun onDataReceived(text: String) {
+                binding.tvBeratSampah.text = "$text kg"
+            }
+        })
+
+        bluetoothHelper.ensurePermissions()
+
+        binding.tvBeratSampah.setOnClickListener {
+            if (hasBluetoothPermission()) bluetoothHelper.listPairedDevices()
+            else bluetoothHelper.ensurePermissions()
+        }
+
+        binding.hoverBluetoothWarning.setOnClickListener {
+            if (hasBluetoothPermission()) bluetoothHelper.listPairedDevices()
+            else bluetoothHelper.ensurePermissions()
+        }
 
         listenMachinesFromFirestore()
     }
 
-    private fun setupMapButton() {
-        binding.tvOpenMap.setOnClickListener {
-            openFullMap()
-        }
-
-        binding.cardMonitoring.setOnClickListener {
-            openFullMap()
+    /* ======================================================
+               BLUETOOTH — CEK PERMISSION
+    ====================================================== */
+    private fun hasBluetoothPermission(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) ==
+                    PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) ==
+                    PackageManager.PERMISSION_GRANTED
+        } else {
+            true
         }
     }
 
-    private fun openFullMap() {
-        // Cek apakah Google Maps app tersedia
-        if (MapsUtils.isGooglePlayServicesAvailable(this)) {
-            // Buka MapsActivity jika Play Services tersedia
+
+    /* ============================================
+          BLUETOOTH — DIALOG PILIH DEVICE (SAFE)
+    ============================================= */
+
+    private fun showPairedDevicesDialog(devices: List<android.bluetooth.BluetoothDevice>) {
+        if (!hasBluetoothPermission()) return
+
+        if (devices.isEmpty()) {
+            Toast.makeText(this, "Tidak ada device ter-paired. Pair dahulu di Settings.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val names = devices.map { device ->
             try {
-                val intent = Intent(this, MapsActivity::class.java)
-                startActivity(intent)
+                "${device.name ?: "Unknown"} — ${device.address}"
+            } catch (e: SecurityException) {
+                "Perangkat — Alamat disembunyikan"
+            }
+        }.toTypedArray()
+
+        AlertDialog.Builder(this)
+            .setTitle("Pilih Device ESP32")
+            .setItems(names) { _, which ->
+                if (hasBluetoothPermission()) {
+                    try {
+                        val addr = try { devices[which].address } catch (e: SecurityException) { null }
+                        if (addr != null) {
+                            bluetoothHelper.connect(addr)
+                        } else {
+                            Toast.makeText(this, "Alamat perangkat tidak dapat diakses", Toast.LENGTH_SHORT).show()
+                        }
+                    } catch (e: SecurityException) {
+                        Toast.makeText(this, "Alamat perangkat tidak dapat diakses", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    bluetoothHelper.ensurePermissions()
+                }
+            }
+            .setNegativeButton("Batal", null)
+            .show()
+    }
+
+    /* ============================================
+             PERMISSION RESULT HANDLING
+    ============================================= */
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == BLUETOOTH_REQ_CODE) {
+            if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+                Toast.makeText(this, "Permission Bluetooth diberikan", Toast.LENGTH_SHORT).show()
+                bluetoothHelper.listPairedDevices()
+            } else {
+                Toast.makeText(this, "Permission Bluetooth dibutuhkan untuk koneksi", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+
+    /* ============================================
+                     onPause
+    ============================================= */
+
+    override fun onPause() {
+        super.onPause()
+        machineListener?.remove()
+        machineListener = null
+        try { bluetoothHelper.disconnect() } catch (_: Exception) {}
+    }
+
+
+    /* ============================================
+                 UPLOAD BERAT SAMPAH
+    ============================================= */
+
+    private fun setupUploadButton() {
+        binding.btnUploadData.setOnClickListener {
+            val berat = binding.tvBeratSampah.text.toString()
+
+            val data = hashMapOf(
+                "berat" to berat,
+                "timestamp" to System.currentTimeMillis()
+            )
+
+            FirebaseFirestore.getInstance()
+                .collection("Data Sampah")
+                .add(data)
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Berhasil upload!", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Gagal upload: ${it.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
+
+
+    /* ============================================
+             INDICATOR BLUETOOTH & WARNING
+    ============================================= */
+
+    private fun setupBeratSampahSection() {
+        updateBluetoothWarning()
+    }
+
+    private fun updateBluetoothWarning() {
+        binding.hoverBluetoothWarning.visibility =
+            if (isBluetoothConnected) android.view.View.GONE else android.view.View.VISIBLE
+    }
+
+
+    /* ============================================
+                     GOOGLE MAPS
+    ============================================= */
+
+    private fun setupMapButton() {
+        binding.tvOpenMap.setOnClickListener { openFullMap() }
+        binding.cardMonitoring.setOnClickListener { openFullMap() }
+    }
+
+    private fun openFullMap() {
+        if (MapsUtils.isGooglePlayServicesAvailable(this)) {
+            try {
+                startActivity(Intent(this, MapsActivity::class.java))
             } catch (e: Exception) {
-                // Fallback ke Google Maps app/web
                 openGoogleMapsExternal()
             }
         } else {
-            // Fallback ke Google Maps app/web
             openGoogleMapsExternal()
         }
     }
@@ -69,7 +269,6 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        // Ambil mesin pertama sebagai center atau rata-rata dari semua mesin
         val validMachines = machines.filter { it.latitude != 0.0 && it.longitude != 0.0 }
 
         if (validMachines.isEmpty()) {
@@ -77,21 +276,20 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        // Buat URL untuk multiple markers
-        val markers = validMachines.joinToString("|") {
-            "${it.latitude},${it.longitude}"
-        }
-
         val firstMachine = validMachines.first()
         val mapUrl = "https://www.google.com/maps/search/?api=1&query=${firstMachine.latitude},${firstMachine.longitude}"
 
         try {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(mapUrl))
-            startActivity(intent)
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(mapUrl)))
         } catch (e: Exception) {
             Toast.makeText(this, "Tidak dapat membuka Google Maps", Toast.LENGTH_SHORT).show()
         }
     }
+
+
+    /* ============================================
+             FIRESTORE — LIST MESIN
+    ============================================= */
 
     private fun updateMachineLocationsList() {
         val container = binding.machineLocationsList
@@ -123,7 +321,6 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        // Header
         val headerText = TextView(this).apply {
             text = "${validMachines.size} Mesin Terdaftar"
             setTextColor(Color.parseColor("#333333"))
@@ -133,7 +330,6 @@ class MainActivity : AppCompatActivity() {
         }
         container.addView(headerText)
 
-        // List mesin dengan koordinat
         validMachines.take(5).forEach { machine ->
             val machineRow = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
@@ -141,7 +337,6 @@ class MainActivity : AppCompatActivity() {
                 gravity = Gravity.CENTER_VERTICAL
             }
 
-            // Status indicator
             val statusDot = android.view.View(this).apply {
                 val params = LinearLayout.LayoutParams(12, 12)
                 params.setMargins(0, 0, 12, 0)
@@ -152,8 +347,7 @@ class MainActivity : AppCompatActivity() {
                 )
             }
 
-            // Machine info
-            val machineInfo = LinearLayout(this).apply {
+            val info = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
             }
@@ -171,42 +365,34 @@ class MainActivity : AppCompatActivity() {
                 textSize = 11f
             }
 
-            machineInfo.addView(nameText)
-            machineInfo.addView(coordText)
+            info.addView(nameText)
+            info.addView(coordText)
 
-            // Link button
             val linkButton = TextView(this).apply {
                 text = "Lihat"
                 setTextColor(Color.parseColor("#2196F3"))
                 textSize = 12f
-                setPadding(12, 4, 12, 4)
-                setOnClickListener {
-                    openMachineLocation(machine)
-                }
+                setOnClickListener { openMachineLocation(machine) }
             }
 
             machineRow.addView(statusDot)
-            machineRow.addView(machineInfo)
+            machineRow.addView(info)
             machineRow.addView(linkButton)
 
             container.addView(machineRow)
 
-            // Divider
             if (machine != validMachines.last()) {
                 val divider = android.view.View(this).apply {
                     layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         1
-                    ).apply {
-                        setMargins(0, 8, 0, 8)
-                    }
+                    ).apply { setMargins(0, 8, 0, 8) }
                     setBackgroundColor(Color.parseColor("#E0E0E0"))
                 }
                 container.addView(divider)
             }
         }
 
-        // Show more button jika ada lebih dari 5 mesin
         if (validMachines.size > 5) {
             val showMoreButton = TextView(this).apply {
                 text = "Lihat ${validMachines.size - 5} mesin lainnya"
@@ -214,34 +400,26 @@ class MainActivity : AppCompatActivity() {
                 textSize = 12f
                 gravity = Gravity.CENTER
                 setPadding(0, 16, 0, 0)
-                setOnClickListener {
-                    openFullMap()
-                }
+                setOnClickListener { openFullMap() }
             }
             container.addView(showMoreButton)
         }
     }
 
     private fun openMachineLocation(machine: Machine) {
-        if (machine.mapLink.isNotEmpty()) {
-            // Gunakan mapLink yang sudah ada
-            try {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(machine.mapLink))
-                startActivity(intent)
-            } catch (e: Exception) {
-                Toast.makeText(this, "Tidak dapat membuka link", Toast.LENGTH_SHORT).show()
-            }
-        } else {
-            // Buat link dari koordinat
-            val mapUrl = "https://www.google.com/maps/search/?api=1&query=${machine.latitude},${machine.longitude}"
-            try {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(mapUrl))
-                startActivity(intent)
-            } catch (e: Exception) {
-                Toast.makeText(this, "Tidak dapat membuka Google Maps", Toast.LENGTH_SHORT).show()
-            }
+        val url = if (machine.mapLink.isNotEmpty()) machine.mapLink
+        else "https://www.google.com/maps/search/?api=1&query=${machine.latitude},${machine.longitude}"
+
+        try { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
+        catch (e: Exception) {
+            Toast.makeText(this, "Tidak dapat membuka link", Toast.LENGTH_SHORT).show()
         }
     }
+
+
+    /* ============================================
+              NAVIGATION & QR SCANNER
+    ============================================= */
 
     private fun setupNavbar() {
         val navbarBinding: NavbarBinding = binding.bottomNavigation
@@ -255,8 +433,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupAddMachineButton() {
         binding.tvAddMachine.setOnClickListener {
-            val intent = Intent(this, AddMachineActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, AddMachineActivity::class.java))
         }
     }
 
@@ -265,6 +442,18 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this@MainActivity, "Data Display clicked", Toast.LENGTH_SHORT).show()
         }
     }
+
+    private fun handleNavigation(position: Int) {}
+
+    private fun handleQRScan() {
+        Toast.makeText(this, "Opening QR Scanner...", Toast.LENGTH_SHORT).show()
+        startActivity(Intent(this, QRScannerActivity::class.java))
+    }
+
+
+    /* ============================================
+                   FIRESTORE LISTENER
+    ============================================= */
 
     private fun listenMachinesFromFirestore() {
         val container = binding.machineContainer
@@ -294,20 +483,19 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 for (doc in result) {
+
                     val machineName = doc.id
                     val status = doc.getBoolean("Status") ?: false
                     val credential = doc.getString("Credential") ?: ""
                     val mapLink = doc.getString("mapLink") ?: ""
 
-                    // Prioritas: Baca dari field Latitude/Longitude langsung
                     var latitude = doc.getDouble("Latitude") ?: 0.0
                     var longitude = doc.getDouble("Longitude") ?: 0.0
 
-                    // Fallback: Extract dari mapLink jika field tidak ada
                     if (latitude == 0.0 && longitude == 0.0 && mapLink.isNotEmpty()) {
-                        val coordinates = Machine.extractCoordinatesFromMapLink(mapLink)
-                        latitude = coordinates?.first ?: 0.0
-                        longitude = coordinates?.second ?: 0.0
+                        val coor = Machine.extractCoordinatesFromMapLink(mapLink)
+                        latitude = coor?.first ?: 0.0
+                        longitude = coor?.second ?: 0.0
                     }
 
                     machines.add(Machine(machineName, status, latitude, longitude, credential, mapLink))
@@ -356,7 +544,6 @@ class MainActivity : AppCompatActivity() {
                             AlertDialog.Builder(this@MainActivity)
                                 .setTitle("Konfirmasi Hapus")
                                 .setMessage("Apakah Anda yakin ingin menghapus mesin \"$machineName\"?")
-                                .setCancelable(true)
                                 .setPositiveButton("Ya") { dialog, _ ->
                                     db.collection("Data Incenerator").document(machineName)
                                         .delete()
@@ -376,9 +563,7 @@ class MainActivity : AppCompatActivity() {
                                         }
                                     dialog.dismiss()
                                 }
-                                .setNegativeButton("Tidak") { dialog, _ ->
-                                    dialog.dismiss()
-                                }
+                                .setNegativeButton("Tidak") { dialog, _ -> dialog.dismiss() }
                                 .show()
                         }
                     }
@@ -395,25 +580,4 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (machineListener == null) {
-            listenMachinesFromFirestore()
-        }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        machineListener?.remove()
-        machineListener = null
-    }
-
-    private fun handleNavigation(position: Int) {
-        // tetap sama
-    }
-
-    private fun handleQRScan() {
-        Toast.makeText(this, "Opening QR Scanner...", Toast.LENGTH_SHORT).show()
-        startActivity(Intent(this, QRScannerActivity::class.java))
-    }
 }
