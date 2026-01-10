@@ -19,11 +19,15 @@ class UserActivity : AppCompatActivity() {
     private lateinit var tvCreatedAt: TextView
     private lateinit var btnEditProfile: Button
 
+    private lateinit var btnLogout: Button
+
+
     private val auth = FirebaseAuth.getInstance()
     private val user = auth.currentUser
     private val userEmail = user?.email
 
     private val db = FirebaseFirestore.getInstance()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +39,8 @@ class UserActivity : AppCompatActivity() {
         tvLastLogin = findViewById(R.id.tvLastLogin)
         tvCreatedAt = findViewById(R.id.tvCreatedAt)
         btnEditProfile = findViewById(R.id.btnEditProfile)
+        btnLogout = findViewById(R.id.btnLogout)
+
 
         if (user == null || userEmail == null) {
             Toast.makeText(this, "User belum login", Toast.LENGTH_SHORT).show()
@@ -44,11 +50,25 @@ class UserActivity : AppCompatActivity() {
 
         loadUserData()
 
+
+
         btnEditProfile.setOnClickListener {
             // Navigate to edit profile screen (you'll need to create this)
             val intent = Intent(this, EditProfileActivity::class.java)
             startActivity(intent)
         }
+
+        btnLogout.setOnClickListener {
+            auth.signOut()
+
+            val intent = Intent(this, LoginActivity::class.java).apply {
+                // Bersihkan semua stack agar user tidak bisa back ke Main/User setelah logout
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            startActivity(intent)
+            finish()
+        }
+
     }
 
     /* ======================================

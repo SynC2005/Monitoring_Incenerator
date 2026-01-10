@@ -58,13 +58,18 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun LoginFirebase(email: String, password: String) {
-        auth.signInWithEmailAndPassword(email,password)
+        auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) {
-                if(it.isSuccessful){
+                if (it.isSuccessful) {
                     Toast.makeText(this, "selamat datang $email", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this, MainActivity::class.java)
+
+                    val intent = Intent(this, MainActivity::class.java).apply {
+                        // Ini membuat MainActivity jadi root; Login tidak ada di belakangnya
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    }
                     startActivity(intent)
-                } else{
+                    finish() // pastikan LoginActivity ditutup
+                } else {
                     Toast.makeText(this, "${it.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
             }

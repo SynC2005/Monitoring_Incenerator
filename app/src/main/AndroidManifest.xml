@@ -39,6 +39,9 @@
             android:exported="false"
             android:label="Peta Persebaran Mesin" />
 
+        <activity android:name=".TutorialActivity" />
+
+
 
         <activity
             android:name=".RegisterActivity"
