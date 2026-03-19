@@ -178,4 +178,29 @@
 
     </LinearLayout>
 
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:contentDescription="@string/logo_left_desc"
+        android:src="@drawable/logosea"
+        tools:layout_editor_absoluteX="180dp"
+        tools:layout_editor_absoluteY="47dp" />
+
+    <ImageView
+        android:layout_width="41dp"
+        android:layout_height="45dp"
+        android:contentDescription="@string/logo_left_desc"
+        android:src="@drawable/ic_telkom_univ"
+        tools:layout_editor_absoluteX="135dp"
+        tools:layout_editor_absoluteY="49dp" />
+
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="39dp"
+        android:contentDescription="@string/logo_left_desc"
+        android:src="@drawable/logoinacos"
+        tools:layout_editor_absoluteX="241dp"
+        tools:layout_editor_absoluteY="50dp" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
