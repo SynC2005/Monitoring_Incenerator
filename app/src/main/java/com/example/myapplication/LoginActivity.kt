@@ -25,6 +25,8 @@ class LoginActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+
+
         binding.btnLogin.setOnClickListener {
             val email = binding.etEmailLogin.text.toString()
             val password = binding.etPasswordLogin.text.toString()
@@ -58,16 +60,29 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun LoginFirebase(email: String, password: String) {
-        auth.signInWithEmailAndPassword(email,password)
+        auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) {
-                if(it.isSuccessful){
-                    Toast.makeText(this, "selamat datang $email", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this, MainActivity::class.java)
+                if (it.isSuccessful) {
+                    Toast.makeText(this, "Selamat datang $email", Toast.LENGTH_SHORT).show()
+
+                    // CHECK: Has the user seen the onboarding tutorial?
+                    val prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+                    val hasSeenOnboarding = prefs.getBoolean("hasSeenOnboarding", false)
+
+                    val intent = if (!hasSeenOnboarding) {
+                        // First time? Go to Tutorial Slides
+                        Intent(this, TutorialActivity::class.java)
+                    } else {
+                        // Already seen? Go straight to Main
+                        Intent(this, MainActivity::class.java)
+                    }
+
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
-                } else{
+                    finish()
+                } else {
                     Toast.makeText(this, "${it.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
             }
     }
-
 }

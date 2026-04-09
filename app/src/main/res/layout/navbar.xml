@@ -68,8 +68,8 @@
         <!-- ✅ Floating Action Button -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabAdd"
-            android:layout_width="55dp"
-            android:layout_height="500dp"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
             android:layout_gravity="center"
             android:src="@drawable/ic_qr"
             app:tint="@android:color/white"

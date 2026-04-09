@@ -16,10 +16,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import com.example.myapplication.databinding.ActivityMainBinding
-import com.example.myapplication.databinding.NavbarBinding
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import android.net.Uri
+import com.google.firebase.auth.FirebaseAuth
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -58,6 +59,27 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onStart() {
+        super.onStart()
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user == null) {
+            val intent = Intent(this, LoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            startActivity(intent)
+            finish()
+        }
+    }
+
+
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        // Karena MainActivity adalah "root/home", Back seharusnya meminimize app, bukan balik ke Login.
+        moveTaskToBack(true)
+    }
+
+
     override fun onPause() {
         super.onPause()
         bluetoothHelper.disconnect()
@@ -84,10 +106,20 @@ class MainActivity : AppCompatActivity() {
     private fun setupNavbar() {
         navbarHelper = NavbarHelper(
             binding.bottomNavigation,
-            onNavigationItemSelected = {
-                when (it) {
-                    1 -> startActivity(Intent(this, DataActivity::class.java))
-                    3 -> startActivity(Intent(this, UserActivity::class.java))
+            onNavigationItemSelected = { pos ->
+                when (pos) {
+                    0 -> {
+                        navbarHelper.selectNavItem(0)
+                    }
+                    1 -> {
+                        startActivity(Intent(this, DataActivity::class.java))
+                    }
+                    3 -> {
+                        startActivity(Intent(this, UserActivity::class.java))
+                    }
+                    4 -> {
+                        startActivity(Intent(this, TutorialActivity::class.java))
+                    }
                 }
             },
             onFabClicked = {
@@ -96,6 +128,13 @@ class MainActivity : AppCompatActivity() {
         )
         navbarHelper.selectNavItem(0)
     }
+
+    override fun onResume() {
+        super.onResume()
+        navbarHelper.selectNavItem(0)
+    }
+
+
 
     // ======================================================
     // BLUETOOTH

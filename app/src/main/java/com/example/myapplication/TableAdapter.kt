@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,7 +22,6 @@ class TableAdapter(private val dataList: List<TableRowData>) :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-
         return if (viewType == TYPE_HEADER) {
             val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.item_table_header, parent, false)
@@ -34,13 +34,20 @@ class TableAdapter(private val dataList: List<TableRowData>) :
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-
         if (holder is RowViewHolder) {
             val row = dataList[position - 1]
+
             holder.tanggal.text = row.tanggal
             holder.mesin.text = row.namaMesin
             holder.status.text = row.status
             holder.user.text = row.user
+
+            // --- VISUAL IMPROVEMENT: Color Code Status ---
+            if (row.status.equals("ON", ignoreCase = true) || row.status.equals("Aktif", ignoreCase = true)) {
+                holder.status.setTextColor(Color.parseColor("#2E7D32")) // Green
+            } else {
+                holder.status.setTextColor(Color.parseColor("#C62828")) // Red
+            }
         }
     }
 
