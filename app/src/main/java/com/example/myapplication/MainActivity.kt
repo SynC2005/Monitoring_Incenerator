@@ -109,20 +109,16 @@ class MainActivity : AppCompatActivity() {
             onNavigationItemSelected = { pos ->
                 when (pos) {
                     0 -> {
-
                         navbarHelper.selectNavItem(0)
                     }
-                    1 -> { 
+                    1 -> {
                         startActivity(Intent(this, DataActivity::class.java))
-
                     }
                     3 -> {
                         startActivity(Intent(this, UserActivity::class.java))
-
                     }
                     4 -> {
-                        startActivity(Intent(this,TutorialActivity::class.java))
-
+                        startActivity(Intent(this, TutorialActivity::class.java))
                     }
                 }
             },

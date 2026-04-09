@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
 }
+val androidPdfViewerVersion by extra("2.8.2")
 
 android {
     namespace = "com.example.myapplication"
@@ -89,7 +90,6 @@ dependencies {
     implementation("com.squareup.picasso:picasso:2.71828")
 
     implementation("androidx.cardview:cardview:1.0.0")
-
 
 
     testImplementation(libs.junit)
